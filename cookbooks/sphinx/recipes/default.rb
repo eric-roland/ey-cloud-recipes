@@ -4,10 +4,10 @@
 #
 
 # Set your application name here
-appname = "appname"
+appname = "real_estate_search"
 
 # Uncomment the flavor of sphinx you want to use
-#flavor = "thinking_sphinx"
+flavor = "thinking_sphinx"
 #flavor = "ultrasphinx"
 
 # If you want to install on a specific utility instance rather than
@@ -25,7 +25,7 @@ utility_name = nil
 #
 # If you don't want scheduled reindexes, just leave this set to nil.
 # Setting it equal to 10 would run the cron job every 10 minutes.
-cron_interval = nil
+cron_interval = 25
 
 if utility_name
   if ['solo', 'app', 'app_master'].include?(node[:instance_role])
