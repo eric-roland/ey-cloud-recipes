@@ -14,7 +14,7 @@
 # require_recipe "mbari-ruby"
 
 # uncomment to turn on thinking sphinx/ultra sphinx. Remember to edit cookbooks/sphinx/recipes/default.rb first!
-# require_recipe "sphinx"
+require_recipe "sphinx"
 
 #uncomment to turn on memcached
 # require_recipe "memcached"
@@ -46,10 +46,16 @@
 #require_recipe "exim::auth"
 
 #uncomment to run the resque recipe
-#require_recipe "resque"
+require_recipe "resque"
 
 #uncomment to run the redis recipe
-#require_recipe "redis"
+require_recipe "redis"
+
+#uncomment to run the ftp recipe
+require_recipe "ftp"
+
+#uncomment to run the librets recipe
+#require_recipe "librets"
 
 #require_recipe "logrotate"
 #
