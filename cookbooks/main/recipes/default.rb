@@ -57,7 +57,7 @@ require_recipe "ftp"
 #uncomment to run the librets recipe
 #require_recipe "librets"
 
-#require_recipe "logrotate"
+require_recipe "logrotate"
 #
 #uncomment to use the solr recipe
 #require_recipe "solr"
