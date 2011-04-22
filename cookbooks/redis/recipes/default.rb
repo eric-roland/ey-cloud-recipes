@@ -3,8 +3,6 @@
 # Recipe:: default
 #
 
-if ['util'].include?(node[:instance_role])
-
 execute "set_overcommit_memory" do
   command "echo 1 > /proc/sys/vm/overcommit_memory"
   action :run
@@ -58,5 +56,4 @@ end
 
 execute "monit reload" do
   action :run
-end
 end
