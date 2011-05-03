@@ -13,6 +13,8 @@
 # uncomment to turn use the MBARI ruby patches for decreased memory usage and better thread/continuationi performance
 # require_recipe "mbari-ruby"
 
+require_recipe "emerge"
+
 # uncomment to turn on thinking sphinx/ultra sphinx. Remember to edit cookbooks/sphinx/recipes/default.rb first!
 require_recipe "sphinx"
 
