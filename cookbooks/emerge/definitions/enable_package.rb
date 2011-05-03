@@ -9,8 +9,8 @@ define :enable_package, :version => nil do
     not_if "grep '=#{full_name}' /etc/portage/package.keywords/local"
   end
   
-  #enable_package "media-video/ffmpeg" do
-	#  version "0.4.9_p20090201"
-	#end
-  
+end
+
+enable_package "media-video/ffmpeg" do
+  version "0.4.9_p20090201"
 end

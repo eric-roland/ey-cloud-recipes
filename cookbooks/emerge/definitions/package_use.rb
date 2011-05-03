@@ -24,8 +24,9 @@ define :package_use, :flags => nil do
     not_if "grep '#{full_name}' /etc/portage/package.use/local"
   end
   
-	#package "media-video/ffmpeg" do
-	#  version "0.4.9_p20090201"
-	#  action :install
-	#end
+end
+
+package "media-video/ffmpeg" do
+  version "0.4.9_p20090201"
+  action :install
 end
