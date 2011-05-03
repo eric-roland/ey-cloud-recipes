@@ -1,5 +1,6 @@
 execute "install_librets" do
 =begin
+sudo emerge --sync
 /etc/make.conf USE='java'
 package.use dev-java/antlr script
   command(" " +
