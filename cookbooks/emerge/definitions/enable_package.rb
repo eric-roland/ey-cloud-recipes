@@ -10,7 +10,3 @@ define :enable_package, :version => nil do
   end
   
 end
-
-enable_package "media-video/ffmpeg" do
-  version "0.4.9_p20090201"
-end

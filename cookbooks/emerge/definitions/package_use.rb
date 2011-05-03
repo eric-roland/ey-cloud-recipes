@@ -25,8 +25,3 @@ define :package_use, :flags => nil do
   end
   
 end
-
-package "media-video/ffmpeg" do
-  version "0.4.9_p20090201"
-  action :install
-end
