@@ -2,86 +2,63 @@
 # Cookbook Name:: sphinx
 # Recipe:: default
 #
+# Make variables friendly!
+@app_name = 'real_estate_search'
+flavor=node[:flavor]
+searchd_file_path=node[:searchd_file_path]
+sphinx_base_port=node[:sphinx_base_port].to_i
+app_count=node[:app_count].to_i
+sphinx_ip=node[:sphinx_ip]
+cron_interval=node[:cron_interval]
 
-# Set your application name here
-appname = "real_estate_search"
+if ['solo', 'app_master'].include?(node[:instance_role])
 
-# Uncomment the flavor of sphinx you want to use
-flavor = "thinking_sphinx"
-#flavor = "ultrasphinx"
-
-# If you want to install on a specific utility instance rather than
-# all application instances, uncomment and set the utility instance
-# name here. Note that if you use a utility instance, your very first
-# deploy may fail because the initial database migration will not have
-# run by the time this executes on the utility instance. If that occurs
-# just deploy again and the recipe should succeed.
-utility_name = "solo"
-# utility_name = "sphinx"
-
-# If you want to have scheduled reindexes in cron, enter the minute
-# interval here. This is passed directly to cron via /, so you should
-# only use numbers between 1 - 59.
-#
-# If you don't want scheduled reindexes, just leave this set to nil.
-# Setting it equal to 10 would run the cron job every 10 minutes.
-cron_interval = 25
-
-if utility_name
-  if ['solo', 'app', 'app_master'].include?(node[:instance_role])
-    run_for_app(appname) do |app_name, data|
-      ey_cloud_report "Sphinx" do
-        message "configuring #{flavor}"
-      end
-
-      directory "/data/#{app_name}/shared/config/sphinx" do
-        recursive true
-        owner node[:owner_name]
-        group node[:owner_name]
-        mode 0755
-      end
-
-      template "/data/#{app_name}/shared/config/sphinx.yml" do
-        owner node[:owner_name]
-        group node[:owner_name]
-        mode 0644
-        source "sphinx.yml.erb"
-        variables({
-          :app_name => app_name,
-          :user => node[:owner_name],
-          :mem_limit => 32
-        })
-      end
-    end
+  enable_package "app-misc/sphinx" do
+    version "1.10_beta"
   end
 
-  if node[:name] == utility_name
-    run_for_app(appname) do |app_name, data|
-      ey_cloud_report "Sphinx" do
-        message "configuring #{flavor}"
-      end
+  package "app-misc/sphinx" do
+    action :upgrade
+    version "1.10_beta"
+  end
 
+  node.engineyard.apps.each do |app|
+    # Setup the base directories for Sphinx.
       directory "/var/run/sphinx" do
-        owner node[:owner_name]
-        group node[:owner_name]
+        owner node.engineyard.environment.ssh_username
+        group node.engineyard.environment.ssh_username
         mode 0755
       end
 
-      directory "/var/log/engineyard/sphinx/#{app_name}" do
+      directory "/var/log/engineyard/sphinx/#{app.name}" do
         recursive true
-        owner node[:owner_name]
-        group node[:owner_name]
+        owner node.engineyard.environment.ssh_username
+        group node.engineyard.environment.ssh_username
         mode 0755
       end
 
-      directory "/data/#{app_name}/shared/config/sphinx" do
+      directory "#{searchd_file_path}" do
+        action :create
         recursive true
-        owner node[:owner_name]
-        group node[:owner_name]
+        mode 0755
+        owner node.engineyard.environment.ssh_username
+        group node.engineyard.environment.ssh_username
+      end
+
+     directory "/data/#{app.name}/shared/config/#{flavor.split("_").join("")}" do
+        owner node.engineyard.environment.ssh_username
+        group node.engineyard.environment.ssh_username
         mode 0755
       end
 
-      remote_file "/etc/logrotate.d/sphinx" do
+     directory "/data/#{app.name}/shared/bin" do
+       action :create
+       mode 0755
+       owner node.engineyard.environment.ssh_username
+       group node.engineyard.environment.ssh_username
+     end
+
+     remote_file "/etc/logrotate.d/sphinx" do
         owner "root"
         group "root"
         mode 0755
@@ -90,168 +67,86 @@ if utility_name
         action :create
       end
 
-      template "/etc/monit.d/sphinx.#{app_name}.monitrc" do
-        source "sphinx.monitrc.erb"
-        owner node[:owner_name]
-        group node[:owner_name]
-        mode 0644
-        variables({
-          :app_name => app_name,
-          :user => node[:owner_name],
-          :flavor => flavor
-        })
-      end
-
-      template "/data/#{app_name}/shared/config/sphinx.yml" do
-        owner node[:owner_name]
-        group node[:owner_name]
-        mode 0644
-        source "sphinx.yml.erb"
-        variables({
-          :app_name => app_name,
-          :user => node[:owner_name],
-          :mem_limit => 32
-        })
-      end
-
-      execute "sphinx config" do
-        command "rake #{flavor}:configure"
-        user node[:owner_name]
-        environment({
-          'HOME' => "/home/#{node[:owner_name]}",
-          'RAILS_ENV' => node[:environment][:framework_env]
-        })
-        cwd "/data/#{app_name}/current"
-      end
-
-      ey_cloud_report "indexing #{flavor}" do
-        message "indexing #{flavor}"
-      end
-
-      execute "#{flavor} index" do
-        command "rake #{flavor}:index"
-        user node[:owner_name]
-        environment({
-          'HOME' => "/home/#{node[:owner_name]}",
-          'RAILS_ENV' => node[:environment][:framework_env]
-        })
-        cwd "/data/#{app_name}/current"
-      end
-
-      execute "monit reload"
-
-      if cron_interval
-        cron "sphinx index" do
-          action  :create
-          minute  "*/#{cron_interval}"
-          hour    '*'
-          day     '*'
-          month   '*'
-          weekday '*'
-          command "cd /data/#{app_name}/current && RAILS_ENV=#{node[:environment][:framework_env]} rake #{flavor}:index"
-          user node[:owner_name]
-        end
-      end
-    end
-  end
-else
-  if ['solo', 'app', 'app_master'].include?(node[:instance_role])
-    run_for_app(appname) do |app_name, data|
-      ey_cloud_report "Sphinx" do
-        message "configuring #{flavor}"
-      end
-
-      directory "/var/run/sphinx" do
-        owner node[:owner_name]
-        group node[:owner_name]
-        mode 0755
-      end
-
-      directory "/var/log/engineyard/sphinx/#{app_name}" do
-        recursive true
-        owner node[:owner_name]
-        group node[:owner_name]
-        mode 0755
-      end
-
-      directory "/data/#{app_name}/shared/config/sphinx" do
-        recursive true
-        owner node[:owner_name]
-        group node[:owner_name]
-        mode 0755
-      end
-
-      remote_file "/etc/logrotate.d/sphinx" do
+      remote_file "/data/#{app.name}/shared/bin/thinking_sphinx_searchd" do
+        source "thinking_sphinx_searchd"
         owner "root"
         group "root"
+        backup 0
         mode 0755
-        source "sphinx.logrotate"
-        backup false
-        action :create
       end
 
-      template "/etc/monit.d/sphinx.#{app_name}.monitrc" do
+    sphinx_base_port=sphinx_base_port+1
+
+     template "/data/#{app.name}/shared/config/sphinx.yml" do
+        owner node.engineyard.environment.ssh_username
+        group node.engineyard.environment.ssh_username
+        mode 0644
+        source "sphinx.yml.erb"
+        variables({
+          :sphinx_ip => node[:ipaddress],
+          :app_name => app.name,
+          :flavor => flavor.eql?("thinking_sphinx") ? "thinkingsphinx" : flavor,
+          :mem_limit => 64,
+          :user => node.engineyard.environment.ssh_username,
+          :searchd_file_path => searchd_file_path,
+          :sphinx_port => sphinx_base_port
+        })
+      end
+
+      template "/etc/monit.d/sphinx.#{app.name}.monitrc" do
         source "sphinx.monitrc.erb"
-        owner node[:owner_name]
-        group node[:owner_name]
+        owner node.engineyard.environment.ssh_username
+        group node.engineyard.environment.ssh_username
         mode 0644
         variables({
-          :app_name => app_name,
-          :user => node[:owner_name],
+          :app_name => app.name,
+          :user => node.engineyard.environment.ssh_username,
           :flavor => flavor
         })
       end
 
-      template "/data/#{app_name}/shared/config/sphinx.yml" do
-        owner node[:owner_name]
-        group node[:owner_name]
-        mode 0644
-        source "sphinx.yml.erb"
-        variables({
-          :app_name => app_name,
-          :user => node[:owner_name],
-          :mem_limit => 32
-        })
-      end
-
-      execute "sphinx config" do
-        command "rake #{flavor}:configure"
-        user node[:owner_name]
-        environment({
-          'HOME' => "/home/#{node[:owner_name]}",
-          'RAILS_ENV' => node[:environment][:framework_env]
-        })
-        cwd "/data/#{app_name}/current"
-      end
-
-      ey_cloud_report "indexing #{flavor}" do
-        message "indexing #{flavor}"
-      end
-
-      execute "#{flavor} index" do
-        command "rake #{flavor}:index"
-        user node[:owner_name]
-        environment({
-          'HOME' => "/home/#{node[:owner_name]}",
-          'RAILS_ENV' => node[:environment][:framework_env]
-        })
-        cwd "/data/#{app_name}/current"
-      end
-
-      execute "monit reload"
-
       if cron_interval
-        cron "sphinx index" do
+        cron "#{app.name} index" do
           action  :create
-          minute  "*/#{cron_interval}"
+          minute  "0-59/5"
           hour    '*'
           day     '*'
           month   '*'
           weekday '*'
-          command "cd /data/#{app_name}/current && RAILS_ENV=#{node[:environment][:framework_env]} rake #{flavor}:index"
-          user node[:owner_name]
+          command "cd /data/#{app.name}/current && RAILS_ENV=#{node[:environment][:framework_env]} bundle exec rake #{flavor}:index >/dev/null 2>&1"
+          user node.engineyard.environment.ssh_username
         end
       end
+      sphinx_base_port=sphinx_base_port+1
+  end
+end
+## this is for the other app / util instances.
+
+if ['app', 'util'].include?(node[:instance_role])
+
+  node.engineyard.apps.each do |app, data|
+    template "/data/#{app.name}/shared/config/sphinx.yml" do
+      owner node.engineyard.environment.ssh_username
+      group node.engineyard.environment.ssh_username
+      mode 0644
+      source "sphinx.yml.erb"
+      variables({
+        :sphinx_ip => sphinx_ip,
+        :app_name => app.name,
+        :flavor => flavor.eql?("thinking_sphinx") ? "thinkingsphinx" : flavor,
+        :mem_limit => 64,
+        :user => node.engineyard.environment.ssh_username,
+        :searchd_file_path => searchd_file_path,
+        :sphinx_port => sphinx_base_port.to_i+app_count.to_i-1
+        })
+    end
+
+    directory "#{searchd_file_path}" do
+      action :create
+      recursive true
+      mode 0755
+      owner node.engineyard.environment.ssh_username
+      group node.engineyard.environment.ssh_username
     end
   end
 end
