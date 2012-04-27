@@ -17,7 +17,7 @@ flavor = "thinking_sphinx"
 # run by the time this executes on the utility instance. If that occurs
 # just deploy again and the recipe should succeed.
 
-utility_name = nil
+utility_name = "sphinx"
 # utility_name = "sphinx"
 
 # If you want to have scheduled reindexes in cron, enter the minute
@@ -27,7 +27,7 @@ utility_name = nil
 # If you don't want scheduled reindexes, just leave this set to nil.
 # Setting it equal to 10 would run the cron job every 10 minutes.
 
-cron_interval = nil #If this is not set your data will NOT be indexed
+cron_interval = 30 #If this is not set your data will NOT be indexed
 
 if utility_name
   sphinx_host = node[:utility_instances].find {|u| u[:name] == utility_name }[:hostname]
