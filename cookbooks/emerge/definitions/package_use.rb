@@ -23,5 +23,4 @@ define :package_use, :flags => nil do
     body full_name
     not_if "grep '#{full_name}' /etc/portage/package.use/local"
   end
-  
 end

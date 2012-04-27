@@ -28,15 +28,15 @@ if node[:instance_role] == "solo" || (node[:instance_role] == "util" && node[:na
         variables({
           :app_name => app_name,
           :user => node[:owner_name],
-          :worker_name => "delayed_job#{count+1}",
+          :worker_name => "#{app_name}_delayed_job#{count+1}",
           :framework_env => node[:environment][:framework_env]
         })
       end
     end
     
-    execute "monit-reload-restart" do
-       command "sleep 30 && monit reload"
+    execute "monit reload" do
        action :run
+       epic_fail true
     end
       
   end
