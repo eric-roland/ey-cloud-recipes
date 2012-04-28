@@ -4,7 +4,7 @@
 #
 
 # Set your application name here
-appname = "real_estate_search"
+app_name = "real_estate_search"
 
 # Uncomment the flavor of sphinx you want to use
 flavor = "thinking_sphinx"
