@@ -106,14 +106,14 @@ if utility_name
         action :create
       end
 
-      directory "/data/#{app.name}/shared/bin" do
+      directory "/data/#{app_name}/shared/bin" do
         action :create
         owner node[:owner_name]
         owner node[:owner_name]
         mode 0755        
       end
 
-      remote_file "/data/#{app.name}/shared/bin/thinking_sphinx_searchd" do
+      remote_file "/data/#{app_name}/shared/bin/thinking_sphinx_searchd" do
         source "thinking_sphinx_searchd"
         owner "root"
         group "root"
