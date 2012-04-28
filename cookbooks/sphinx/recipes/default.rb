@@ -35,7 +35,7 @@ sphinx_base_port=node[:sphinx_base_port].to_i
 if utility_name
   sphinx_host = node[:utility_instances].find {|u| u[:name] == utility_name }[:hostname]
   if node[:name] == utility_name
-    run_for_app(appname) do |app_name, data|
+    run_for_app("appname") do |app_name, data|
       ey_cloud_report "Sphinx" do
         message "configuring #{flavor}"
       end
@@ -72,7 +72,7 @@ if utility_name
   end
 
   if node[:name] == utility_name
-    run_for_app(appname) do |app_name, data|
+    run_for_app("appname") do |app_name, data|
       ey_cloud_report "Sphinx" do
         message "configuring #{flavor}"
       end
@@ -198,7 +198,7 @@ if utility_name
   end
 else
   if node[:name] == utility_name
-    run_for_app(appname) do |app_name, data|
+    run_for_app("appname") do |app_name, data|
       ey_cloud_report "Sphinx" do
         message "configuring #{flavor}"
       end
