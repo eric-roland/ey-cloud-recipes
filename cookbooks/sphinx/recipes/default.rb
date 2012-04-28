@@ -34,7 +34,7 @@ sphinx_base_port=node[:sphinx_base_port].to_i
 
 if utility_name
   sphinx_host = node[:utility_instances].find {|u| u[:name] == utility_name }[:hostname]
-  if ['util'].include?(node[:instance_role])
+  if ['util'].include?(node[:instance_role]) && utility_name == "sphinx"
     run_for_app(appname) do |app_name, data|
       ey_cloud_report "Sphinx" do
         message "configuring #{flavor}"
