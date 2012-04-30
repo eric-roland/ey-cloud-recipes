@@ -1,5 +1,9 @@
 require 'chef/log'
 
+log "some string to log" do
+  level :info  # (default)  also supports :warn, :debug, and :error
+end
+
 #
 # Cookbook Name:: sphinx
 # Recipe:: default
@@ -36,11 +40,11 @@ sphinx_base_port=node[:sphinx_base_port].to_i
 
 if utility_name
   sphinx_host = node[:utility_instances].find {|u| u[:name] == utility_name }[:hostname]
-  log "node name #{node[:name]} utility name #{utility_name}"
+  #log "node name #{node[:name]} utility name #{utility_name}"
   if node[:name] == utility_name
-    log "we entered after if node[:name] == utility_name"
+    #log "we entered after if node[:name] == utility_name"
     run_for_app("appname") do |app_name, data|
-      log "app name #{app_name} data #{data}"
+      #log "app name #{app_name} data #{data}"
       ey_cloud_report "Sphinx" do
         message "configuring #{flavor}"
       end
@@ -202,11 +206,11 @@ if utility_name
     end
   end
 else
-  log "from else - node name #{node[:name]} utility name #{utility_name}"
+  #log "from else - node name #{node[:name]} utility name #{utility_name}"
   if node[:name] == utility_name
-    log "inside the if statement"
+    #log "inside the if statement"
     run_for_app("appname") do |app_name, data|
-      log "app name #{app_name} data #{data}"
+      #log "app name #{app_name} data #{data}"
       ey_cloud_report "Sphinx" do
         message "configuring #{flavor}"
       end
