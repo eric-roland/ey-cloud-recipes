@@ -29,6 +29,10 @@ utility_name = "sphinx"
 
 cron_interval = 30 #If this is not set your data will NOT be indexed
 
+ey_cloud_report "Sphinx" do
+  message "Recipe ran!"
+end
+
 if utility_name
   sphinx_host = node[:utility_instances].find {|u| u[:name] == utility_name }[:hostname]
   if ['solo', 'app', 'app_master'].include?(node[:instance_role])
@@ -60,6 +64,9 @@ if utility_name
   end
 
   if node[:name] == utility_name
+    ey_cloud_report "Sphinx" do
+      message "utility name block ran!"
+    end
     run_for_app(appname) do |app_name, data|
       ey_cloud_report "Sphinx" do
         message "configuring #{flavor}"
