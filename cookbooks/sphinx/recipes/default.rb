@@ -37,7 +37,7 @@ if utility_name
   puts "node name #{node[:name]} utility name #{utility_name}"
   if node[:name] == utility_name
     puts "we entered after if node[:name] == utility_name"
-    run_for_app("appname") do |app_name, data|
+    run_for_app(appname) do |app_name, data|
       puts "app name #{app_name} data #{data}"
       ey_cloud_report "Sphinx" do
         message "configuring #{flavor}"
@@ -75,7 +75,7 @@ if utility_name
   end
 
   if node[:name] == utility_name
-    run_for_app("appname") do |app_name, data|
+    run_for_app(appname) do |app_name, data|
       ey_cloud_report "Sphinx" do
         message "configuring #{flavor}"
       end
@@ -203,7 +203,7 @@ else
   puts "from else - node name #{node[:name]} utility name #{utility_name}"
   if node[:name] == utility_name
     puts "inside the if statement"
-    run_for_app("appname") do |app_name, data|
+    run_for_app(appname) do |app_name, data|
       puts "app name #{app_name} data #{data}"
       ey_cloud_report "Sphinx" do
         message "configuring #{flavor}"
