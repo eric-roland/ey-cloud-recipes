@@ -4,7 +4,7 @@
 #
 
 # Set your application name here
-app_name = "real_estate_search"
+appname = "real_estate_search"
 
 # Uncomment the flavor of sphinx you want to use
 flavor = "thinking_sphinx"
@@ -29,27 +29,12 @@ utility_name = "sphinx"
 
 cron_interval = 30 #If this is not set your data will NOT be indexed
 
-# Port number for searchd and sphinx.yml to understand.
-sphinx_base_port=node[:sphinx_base_port].to_i
-
 if utility_name
   sphinx_host = node[:utility_instances].find {|u| u[:name] == utility_name }[:hostname]
-  puts "node name #{node[:name]} utility name #{utility_name}"
-  if node[:name] == utility_name
-    puts "we entered after if node[:name] == utility_name"
+  if ['solo', 'app', 'app_master'].include?(node[:instance_role])
     run_for_app(appname) do |app_name, data|
-      puts "app name #{app_name} data #{data}"
       ey_cloud_report "Sphinx" do
         message "configuring #{flavor}"
-      end
-
-      enable_package "app-misc/sphinx" do
-        version "1.10_beta"
-      end
-
-      package "app-misc/sphinx" do
-        action :upgrade
-        version "1.10_beta"
       end
 
       directory "/data/#{app_name}/shared/config/sphinx" do
@@ -109,21 +94,6 @@ if utility_name
         action :create
       end
 
-      directory "/data/#{app_name}/shared/bin" do
-        action :create
-        owner node[:owner_name]
-        owner node[:owner_name]
-        mode 0755        
-      end
-
-      remote_file "/data/#{app_name}/shared/bin/thinking_sphinx_searchd" do
-        source "thinking_sphinx_searchd"
-        owner "root"
-        group "root"
-        backup 0
-        mode 0755
-      end
-
       template "/etc/monit.d/sphinx.#{app_name}.monitrc" do
         source "sphinx.monitrc.erb"
         owner node[:owner_name]
@@ -136,8 +106,6 @@ if utility_name
         })
       end
 
-      sphinx_base_port=sphinx_base_port+1
-
       template "/data/#{app_name}/shared/config/sphinx.yml" do
         owner node[:owner_name]
         group node[:owner_name]
@@ -147,9 +115,7 @@ if utility_name
           :app_name => app_name,
           :address => sphinx_host,
           :user => node[:owner_name],
-          :mem_limit => '32M',
-          :searchd_file_path => searchd_file_path,
-          :sphinx_port => sphinx_base_port
+          :mem_limit => '32M'
         })
       end
 
@@ -200,11 +166,8 @@ if utility_name
     end
   end
 else
-  puts "from else - node name #{node[:name]} utility name #{utility_name}"
-  if node[:name] == utility_name
-    puts "inside the if statement"
+  if ['solo', 'app', 'app_master'].include?(node[:instance_role])
     run_for_app(appname) do |app_name, data|
-      puts "app name #{app_name} data #{data}"
       ey_cloud_report "Sphinx" do
         message "configuring #{flavor}"
       end
