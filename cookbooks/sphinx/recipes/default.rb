@@ -1,6 +1,4 @@
 require 'chef/log'
-log_level          :info
-log_location       STDOUT
 
 #
 # Cookbook Name:: sphinx
