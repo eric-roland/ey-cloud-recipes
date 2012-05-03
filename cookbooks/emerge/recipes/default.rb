@@ -24,11 +24,15 @@
 #   action :install
 # end
 
-enable_package "media-video/ffmpeg" do
-  version "0.4.9_p20090201"
-end
+if ['util'].include?(node[:instance_role])
+  if node[:name] == 'redis'
+    enable_package "media-video/ffmpeg" do
+      version "0.4.9_p20090201"
+    end
 
-package "media-video/ffmpeg" do
-  version "0.4.9_p20090201"
-  action :install
+    package "media-video/ffmpeg" do
+      version "0.4.9_p20090201"
+      action :install
+    end
+  end
 end
