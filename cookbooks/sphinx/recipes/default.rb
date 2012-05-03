@@ -67,6 +67,16 @@ if utility_name
     ey_cloud_report "Sphinx" do
       message "utility name block ran!"
     end
+    
+    enable_package "app-misc/sphinx" do
+        version "1.10_beta"
+      end
+
+    package "app-misc/sphinx" do
+      action :upgrade
+      version "1.10_beta"
+    end
+    
     run_for_app(appname) do |app_name, data|
       ey_cloud_report "Sphinx" do
         message "configuring #{flavor}"
