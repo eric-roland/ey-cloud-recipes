@@ -9,6 +9,9 @@ if ['util'].include?(node[:instance_role])
       not_if { "gem list | grep resque" }
     end
 
+    #only need one worker for now
+    worker_count = 1
+=begin
     case node[:ec2][:instance_type]
       when 'm1.small': worker_count = 2
       when 'c1.medium': worker_count = 3
@@ -16,7 +19,7 @@ if ['util'].include?(node[:instance_role])
         else 
           worker_count = 4
       end
-  
+=end
 
       node[:applications].each do |app, data|
         template "/etc/monit.d/resque_#{app}.monitrc" do 
