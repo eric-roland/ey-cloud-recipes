@@ -143,7 +143,7 @@ if utility_name
       end
 
       execute "sphinx config" do
-        command "sudo bundle exec rake #{flavor}:configure"
+        command "bundle exec rake #{flavor}:configure"
         user node[:owner_name]
         environment({
           'HOME' => "/home/#{node[:owner_name]}",
@@ -157,7 +157,7 @@ if utility_name
       end
 
       execute "#{flavor} index" do
-        command "sudo bundle exec rake #{flavor}:index"
+        command "bundle exec rake #{flavor}:index"
         user node[:owner_name]
         environment({
           'HOME' => "/home/#{node[:owner_name]}",
@@ -252,7 +252,7 @@ else
 
 
       execute "sphinx config" do
-        command "sudo bundle exec rake #{flavor}:configure"
+        command "bundle exec rake #{flavor}:configure"
         user node[:owner_name]
         environment({
           'HOME' => "/home/#{node[:owner_name]}",
@@ -266,7 +266,7 @@ else
       end
 
       execute "#{flavor} index" do
-        command "sudo bundle exec rake #{flavor}:index"
+        command "bundle exec rake #{flavor}:index"
         user node[:owner_name]
         environment({
           'HOME' => "/home/#{node[:owner_name]}",
