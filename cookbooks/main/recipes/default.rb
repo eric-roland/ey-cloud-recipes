@@ -49,6 +49,7 @@ require_recipe "redis"
 require_recipe "logrotate"
 require_recipe "emerge"
 require_recipe "ftp"
+require_recipe "delayed_job"
 #
 #uncomment to use the solr recipe
 #require_recipe "solr"
