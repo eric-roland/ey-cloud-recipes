@@ -17,7 +17,7 @@ flavor = "thinking_sphinx"
 # run by the time this executes on the utility instance. If that occurs
 # just deploy again and the recipe should succeed.
 
-utility_name = "sphinx"
+utility_name = nil
 # utility_name = "sphinx"
 
 # If you want to have scheduled reindexes in cron, enter the minute
